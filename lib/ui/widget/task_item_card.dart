@@ -4,9 +4,6 @@ import 'package:task_manager/data/model/task.dart';
 import 'package:task_manager/data/network_caller.dart';
 import 'package:task_manager/data/network_response.dart';
 import '../../data/utility.dart';
-import '../controller/new_task_controller.dart';
-import '../controller/progress_task_controller.dart';
-import '../controller/task_count_controller.dart';
 
 enum TaskStatus { New, Progress, Completed, Cancelled }
 

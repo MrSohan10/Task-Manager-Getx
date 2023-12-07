@@ -32,8 +32,7 @@ class _ProfileSummaryState extends State<ProfileSummary> {
     return ListTile(
         onTap: () {
           if (widget.enableOnTap) {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const UpdateProfile()));
+            Get.to(const UpdateProfile());
           }
         },
         tileColor: Colors.green,
