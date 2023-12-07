@@ -4,6 +4,8 @@ import 'package:task_manager/data/model/task.dart';
 import 'package:task_manager/data/network_caller.dart';
 import 'package:task_manager/data/network_response.dart';
 import '../../data/utility.dart';
+import '../controller/delete_task_controller.dart';
+import '../controller/update_task_status_controller.dart';
 
 enum TaskStatus { New, Progress, Completed, Cancelled }
 
@@ -26,21 +28,6 @@ class TaskItemCard extends StatefulWidget {
 }
 
 class _TaskItemCardState extends State<TaskItemCard> {
-  Future<void> deleteTask() async {
-    final NetworkResponse response =
-        await NetworkCaller().getRequest(Urls.deleteTask(widget.task.sId));
-    if (response.isSuccess) {
-      widget.onDelete();
-    }
-  }
-
-  Future<void> updateTaskStatus(status) async {
-    final response = await NetworkCaller()
-        .getRequest(Urls.updateTaskStatus(widget.task.sId.toString(), status));
-    if (response.isSuccess) {
-      widget.statusChange();
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,11 +80,12 @@ class _TaskItemCardState extends State<TaskItemCard> {
   }
 
   Future<void> showUpdateStatusModel() async {
-    List<ListTile> itmes = TaskStatus.values
+    List<ListTile> items = TaskStatus.values
         .map((e) => ListTile(
               title: Text('${e.name}'),
               onTap: () {
-                updateTaskStatus(e.name);
+                Get.find<UpdateTaskStatusController>()
+                    .updateTaskStatus(e.name, widget.statusChange, widget.task);
                 Get.back();
               },
             ))
@@ -110,7 +98,7 @@ class _TaskItemCardState extends State<TaskItemCard> {
             title: Text("Update Status"),
             content: Column(
               mainAxisSize: MainAxisSize.min,
-              children: itmes,
+              children: items,
             ),
             actions: [
               TextButton(
@@ -133,13 +121,14 @@ class _TaskItemCardState extends State<TaskItemCard> {
             actions: [
               TextButton(
                   onPressed: () {
-                    deleteTask();
-                    Navigator.pop(context);
+                    Get.find<DeleteTaskController>()
+                        .deleteTask(widget.task, widget.onDelete);
+                    Get.back();
                   },
                   child: Text("Yes")),
               TextButton(
                   onPressed: () {
-                    Navigator.pop(context);
+                    Get.back();
                   },
                   child: Text("Cancel"))
             ],
