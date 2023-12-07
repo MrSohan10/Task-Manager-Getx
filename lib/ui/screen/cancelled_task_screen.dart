@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-
-import '../../data/model/task_list_model.dart';
-import '../../data/network_caller.dart';
-import '../../data/network_response.dart';
-import '../../data/utility.dart';
+import 'package:get/get.dart';
+import '../controller/canceled_task_controller.dart';
 import '../widget/profile_summary.dart';
 import '../widget/task_item_card.dart';
 
@@ -15,27 +12,13 @@ class CancelledTaskScreen extends StatefulWidget {
 }
 
 class _CancelledTaskScreenState extends State<CancelledTaskScreen> {
-  TaskListModel taskListModel = TaskListModel();
-  bool _taskListProgress = false;
-  Future<void> getCancelledTask() async {
-    _taskListProgress = true;
-    if (mounted) {
-      setState(() {});
-    }
-    final NetworkResponse response =
-    await NetworkCaller().getRequest(Urls.cancelTaskList);
-    if (response.isSuccess) {
-      taskListModel = TaskListModel.fromJson(response.jsonResponse);
-    }
-    _taskListProgress = false;
-    if (mounted) {
-      setState(() {});
-    }
-  }
+  CancelledTaskController _cancelledTaskController =
+      Get.find<CancelledTaskController>();
+
   @override
   void initState() {
     super.initState();
-    getCancelledTask();
+    _cancelledTaskController.getCancelledTask();
   }
 
   @override
@@ -49,26 +32,30 @@ class _CancelledTaskScreenState extends State<CancelledTaskScreen> {
               height: 10,
             ),
             Expanded(
-                child: Visibility(
-                  visible: _taskListProgress == false,
-                  replacement: const Center(
+                child: GetBuilder<CancelledTaskController>(
+                  builder: (controller) {
+                    return Visibility(
+              visible: controller.taskListProgress == false,
+              replacement: const Center(
                     child: CircularProgressIndicator(),
-                  ),
-                  child: ListView.builder(
-                    itemCount: taskListModel.taskList?.length ?? 0,
+              ),
+              child: ListView.builder(
+                    itemCount: controller.taskListModel.taskList?.length ?? 0,
                     itemBuilder: (context, index) {
                       return TaskItemCard(
                         color: Colors.red,
-                        task: taskListModel.taskList![index],
+                        task: controller.taskListModel.taskList![index],
                         onDelete: () {
-                          getCancelledTask();
+                          controller.getCancelledTask();
                         },
-                        statusChange: (){
-                          getCancelledTask();
+                        statusChange: () {
+                          controller.getCancelledTask();
                         },
                       );
                     },
-                  ),
+              ),
+            );
+                  }
                 )),
           ],
         ),
