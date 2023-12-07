@@ -101,7 +101,7 @@ class _TaskItemCardState extends State<TaskItemCard> {
               title: Text('${e.name}'),
               onTap: () {
                 updateTaskStatus(e.name);
-                Navigator.pop(context);
+                Get.back();
               },
             ))
         .toList();
@@ -118,7 +118,7 @@ class _TaskItemCardState extends State<TaskItemCard> {
             actions: [
               TextButton(
                   onPressed: () {
-                    Navigator.pop(context);
+                    Get.back();
                   },
                   child: Text("Cancel"))
             ],

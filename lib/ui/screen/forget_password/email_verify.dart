@@ -138,7 +138,7 @@ class _EmailVerificationState extends State<EmailVerification> {
     if (mounted) {
       setState(() {});
     }
-    if (response.isSuccess) {
+    if (response.isSuccess && response.jsonResponse['status'] == 'success') {
       receiveMailAddress.receiveMail(_emailController.text.trim());
       Navigator.push(context,
           MaterialPageRoute(builder: (context) => const PinVerification()));

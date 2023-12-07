@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:task_manager/ui/controller/auth_controller.dart';
 import 'package:task_manager/ui/screen/login_screen.dart';
 import 'package:task_manager/ui/screen/update_profile.dart';
@@ -74,15 +75,12 @@ class _ProfileSummaryState extends State<ProfileSummary> {
               TextButton(
                   onPressed: () async {
                     await AuthController.clearAuthData();
-                    Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(builder: (context) => const LoginScreen()),
-                            (route) => false);
+                    Get.offAll(const LoginScreen());
                   },
                   child: Text("Yes")),
               TextButton(
                   onPressed: () {
-                    Navigator.pop(context);
+                    Get.back();
                   },
                   child: Text("Cancel"))
             ],

@@ -162,13 +162,13 @@ class _PinVerificationState extends State<PinVerification> {
       setState(() {});
     }
 
-    if (response.isSuccess) {
+    if (response.isSuccess && response.jsonResponse['status'] == 'success') {
       receiveOtp.receiveOtp(_pinController.text.trim());
       Navigator.push(context,
           MaterialPageRoute(builder: (context) => const SetPassword()));
     } else {
       if (mounted) {
-        showSnackbar(context, 'verify failed! please try again', true);
+        showSnackbar(context, 'invalid pin! please try again', true);
       }
     }
   }
