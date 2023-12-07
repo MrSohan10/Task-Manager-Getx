@@ -94,6 +94,14 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                         newTaskController.taskListModel.taskList?.length ?? 0,
                     itemBuilder: (context, index) {
                       return TaskItemCard(
+                        onDelete: (){
+                          _newTaskController.getNewTaskList();
+                         _taskCountController.getTaskCount();
+                        },
+                        statusChange: (){
+                          _newTaskController.getNewTaskList();
+                          _taskCountController.getTaskCount();
+                        },
                         color: Colors.blue,
                         task: newTaskController.taskListModel.taskList![index],
                       );

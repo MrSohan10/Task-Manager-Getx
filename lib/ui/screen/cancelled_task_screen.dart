@@ -63,7 +63,7 @@ class _CancelledTaskScreenState extends State<CancelledTaskScreen> {
                         onDelete: () {
                           getCancelledTask();
                         },
-                        onStatusChange: (){
+                        statusChange: (){
                           getCancelledTask();
                         },
                       );

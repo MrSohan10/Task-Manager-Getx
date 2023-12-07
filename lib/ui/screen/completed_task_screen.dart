@@ -67,7 +67,7 @@ class _CompletedTaskScreenState extends State<CompletedTaskScreen> {
                           onDelete: () {
                             getCompletedTask();
                           },
-                          onStatusChange: (){
+                          statusChange: (){
                             getCompletedTask();
                           },
                         );

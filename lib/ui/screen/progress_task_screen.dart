@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:task_manager/data/model/task_list_model.dart';
-
-import '../../data/network_caller.dart';
-import '../../data/network_response.dart';
-import '../../data/utility.dart';
+import 'package:get/get.dart';
+import 'package:task_manager/ui/controller/progress_task_controller.dart';
 import '../widget/profile_summary.dart';
 import '../widget/task_item_card.dart';
 
@@ -15,29 +12,13 @@ class ProgressTaskScreen extends StatefulWidget {
 }
 
 class _ProgressTaskScreenState extends State<ProgressTaskScreen> {
-
-  TaskListModel taskListModel = TaskListModel();
-  bool _taskListProgress = false;
-  Future<void> getProgressTask() async {
-    _taskListProgress = true;
-    if (mounted) {
-      setState(() {});
-    }
-    final NetworkResponse response =
-    await NetworkCaller().getRequest(Urls.progressTaskList);
-    if (response.isSuccess) {
-      taskListModel = TaskListModel.fromJson(response.jsonResponse);
-    }
-    _taskListProgress = false;
-    if (mounted) {
-      setState(() {});
-    }
-  }
+  final ProgressTaskController _progressTaskController =
+      Get.find<ProgressTaskController>();
 
   @override
   void initState() {
     super.initState();
-    getProgressTask();
+    _progressTaskController.getProgressTask();
   }
 
   @override
@@ -45,8 +26,8 @@ class _ProgressTaskScreenState extends State<ProgressTaskScreen> {
     return Scaffold(
       body: SafeArea(
         child: RefreshIndicator(
-          onRefresh: ()async{
-            getProgressTask();
+          onRefresh: () async {
+            _progressTaskController.getProgressTask();
           },
           child: Column(
             children: [
@@ -54,28 +35,30 @@ class _ProgressTaskScreenState extends State<ProgressTaskScreen> {
               const SizedBox(
                 height: 10,
               ),
-              Expanded(
-                  child: Visibility(
-                    visible: _taskListProgress == false,
-                    replacement: const Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                    child: ListView.builder(
-                      itemCount: taskListModel.taskList?.length ?? 0,
-                      itemBuilder: (context, index) {
-                        return TaskItemCard(
-                          color: Colors.purple,
-                          task: taskListModel.taskList![index],
-                          onDelete: () {
-                            getProgressTask();
-                          },
-                          onStatusChange: (){
-                            getProgressTask();
-                          },
-                        );
-                      },
-                    ),
-                  )),
+              Expanded(child:
+                  GetBuilder<ProgressTaskController>(builder: (controller) {
+                return Visibility(
+                  visible: controller.taskListProgress == false,
+                  replacement: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                  child: ListView.builder(
+                    itemCount: controller.taskListModel.taskList?.length ?? 0,
+                    itemBuilder: (context, index) {
+                      return TaskItemCard(
+                        color: Colors.purple,
+                        task: controller.taskListModel.taskList![index],
+                        onDelete: () {
+                          controller.getProgressTask();
+                        },
+                        statusChange: () {
+                          controller.getProgressTask();
+                        },
+                      );
+                    },
+                  ),
+                );
+              })),
             ],
           ),
         ),
