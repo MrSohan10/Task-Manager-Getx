@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:task_manager/data/network_caller.dart';
 import 'package:task_manager/data/network_response.dart';
 import 'package:task_manager/data/utility.dart';
@@ -6,11 +8,14 @@ import 'package:task_manager/ui/widget/body_background.dart';
 import 'package:task_manager/ui/widget/profile_summary.dart';
 import 'package:task_manager/ui/widget/snackbar_message.dart';
 
+import '../controller/new_task_controller.dart';
+import '../controller/task_count_controller.dart';
+
 class AddNewTaskScreen extends StatefulWidget {
-  const AddNewTaskScreen({super.key, required this.onSave});
+  const AddNewTaskScreen({super.key,});
   @override
   State<AddNewTaskScreen> createState() => _AddNewTaskScreenState();
-  final VoidCallback onSave;
+
 }
 
 class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
@@ -114,7 +119,8 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
       if(response.isSuccess){
         _titleController.clear();
     _descriptionController.clear();
-    widget.onSave();
+        Get.find<NewTaskController>().getNewTaskList();
+        Get.find<TaskCountController>().getTaskCount();
         if(mounted){
           showSnackbar(context, 'New Task add Successfully!');
         }

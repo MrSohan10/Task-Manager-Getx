@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:task_manager/ui/controller/login_controller.dart';
+import 'package:task_manager/ui/controller/new_task_controller.dart';
 import 'package:task_manager/ui/controller/sign_up_controller.dart';
+import 'package:task_manager/ui/controller/task_count_controller.dart';
 import 'package:task_manager/ui/screen/splash_screen.dart';
 
 class TaskManager extends StatelessWidget {
-  static GlobalKey <NavigatorState> navigationKey = GlobalKey<NavigatorState>();
+  static GlobalKey<NavigatorState> navigationKey = GlobalKey<NavigatorState>();
 
   const TaskManager({super.key});
+
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
@@ -27,7 +30,8 @@ class TaskManager extends StatelessWidget {
               filled: true,
               fillColor: Colors.white,
               border: OutlineInputBorder(borderSide: BorderSide.none),
-              focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.green))),
+              focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.green))),
           elevatedButtonTheme: ElevatedButtonThemeData(
               style: ElevatedButton.styleFrom(
             padding: EdgeInsets.symmetric(vertical: 14),
@@ -35,10 +39,13 @@ class TaskManager extends StatelessWidget {
     );
   }
 }
-class ControllerBinder extends Bindings{
+
+class ControllerBinder extends Bindings {
   @override
   void dependencies() {
- Get.put(SignupController());
- Get.put(LoginController());
+    Get.put(SignupController());
+    Get.put(LoginController());
+    Get.put(NewTaskController());
+    Get.put(TaskCountController());
   }
 }

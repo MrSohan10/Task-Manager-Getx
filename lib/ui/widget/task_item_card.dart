@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:task_manager/data/model/task.dart';
 import 'package:task_manager/data/network_caller.dart';
 import 'package:task_manager/data/network_response.dart';
-
 import '../../data/utility.dart';
+import '../controller/new_task_controller.dart';
+import '../controller/task_count_controller.dart';
 
 enum TaskStatus { New, Progress, Completed, Cancelled }
 
@@ -11,15 +13,11 @@ class TaskItemCard extends StatefulWidget {
   const TaskItemCard({
     super.key,
     required this.task,
-    required this.onDelete,
     required this.color,
-    required this.onStatusChange,
   });
 
   final Color color;
   final Task task;
-  final VoidCallback onDelete;
-  final VoidCallback onStatusChange;
 
   @override
   State<TaskItemCard> createState() => _TaskItemCardState();
@@ -30,7 +28,8 @@ class _TaskItemCardState extends State<TaskItemCard> {
     final NetworkResponse response =
         await NetworkCaller().getRequest(Urls.deleteTask(widget.task.sId));
     if (response.isSuccess) {
-      widget.onDelete();
+      Get.find<NewTaskController>().getNewTaskList();
+      Get.find<TaskCountController>().getTaskCount();
     }
   }
 
@@ -38,7 +37,8 @@ class _TaskItemCardState extends State<TaskItemCard> {
     final response = await NetworkCaller()
         .getRequest(Urls.updateTaskStatus(widget.task.sId.toString(), status));
     if (response.isSuccess) {
-      widget.onStatusChange();
+      Get.find<NewTaskController>().getNewTaskList();
+      Get.find<TaskCountController>().getTaskCount();
     }
   }
 
