@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:task_manager/ui/controller/set_password_controller.dart';
 import 'package:task_manager/ui/screen/login_screen.dart';
 import 'package:task_manager/ui/widget/body_background.dart';
 
@@ -20,7 +22,6 @@ class _SetPasswordState extends State<SetPassword> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  bool _inProgress = false;
 
   @override
   Widget build(BuildContext context) {
@@ -91,19 +92,22 @@ class _SetPasswordState extends State<SetPassword> {
                     ),
                     SizedBox(
                       width: double.infinity,
-                      child: Visibility(
-                        visible: _inProgress == false,
-                        replacement: const Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                        child: ElevatedButton(
-                          onPressed: resetPassword,
-                          child: const Text(
-                            "Confirm",
-                            style: TextStyle(fontSize: 16),
+                      child: GetBuilder<SetPasswordController>(
+                          builder: (controller) {
+                        return Visibility(
+                          visible: controller.inProgress == false,
+                          replacement: const Center(
+                            child: CircularProgressIndicator(),
                           ),
-                        ),
-                      ),
+                          child: ElevatedButton(
+                            onPressed: resetPassword,
+                            child: const Text(
+                              "Confirm",
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ),
+                        );
+                      }),
                     ),
                     const SizedBox(
                       height: 48,
@@ -120,11 +124,7 @@ class _SetPasswordState extends State<SetPassword> {
                         ),
                         TextButton(
                           onPressed: () {
-                            Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const LoginScreen()),
-                                (route) => false);
+                            Get.offAll(const LoginScreen());
                           },
                           child: const Text(
                             "Sign in",
@@ -147,42 +147,27 @@ class _SetPasswordState extends State<SetPassword> {
     if (!_formKey.currentState!.validate()) {
       return;
     }
-   if(_passwordController.text==_confirmPasswordController.text) {
-      _inProgress = true;
-      if (mounted) {
-        setState(() {});
-      }
+    if (_passwordController.text == _confirmPasswordController.text) {
+      final response = await Get.find<SetPasswordController>()
+          .resetPassword(_confirmPasswordController.text);
 
-      final NetworkResponse response =
-          await NetworkCaller().postRequest(Urls.resetPass, body: {
-        "email": ReceiveMailAndOtp.mail,
-        "OTP": ReceiveMailAndOtp.otp,
-        "password": _confirmPasswordController.text
-      });
-      _inProgress = false;
-      if (mounted) {
-        setState(() {});
-      }
-
-      if (response.isSuccess) {
+      if (response) {
         showSnackbar(
           context,
-          'Password change successfully! please Login',
+          Get.find<SetPasswordController>().message,
         );
-        Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const LoginScreen()),
-            (route) => false);
+        Get.offAll(const LoginScreen());
       } else {
         if (mounted) {
-          showSnackbar(context, 'Something is wrong! please try again', true);
+          showSnackbar(
+              context, Get.find<SetPasswordController>().failedMessage, true);
         }
       }
-    }else{
-     if (mounted) {
-       showSnackbar(context, 'Password Not match', true);
-     }
-   }
+    } else {
+      if (mounted) {
+        showSnackbar(context, 'Password Not match', true);
+      }
+    }
   }
 
   @override

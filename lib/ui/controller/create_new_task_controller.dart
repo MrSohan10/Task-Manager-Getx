@@ -1,11 +1,9 @@
 import 'package:get/get.dart';
 import 'package:task_manager/ui/controller/task_count_controller.dart';
-
 import '../../data/network_caller.dart';
 import '../../data/network_response.dart';
 import '../../data/utility.dart';
 import 'new_task_controller.dart';
-
 class CreateNewTaskController extends GetxController {
   bool _inProgress = false;
   String _message = '';

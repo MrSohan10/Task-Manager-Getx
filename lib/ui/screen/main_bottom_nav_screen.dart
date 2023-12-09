@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:task_manager/ui/controller/main_bottom_nav_controller.dart';
 import 'package:task_manager/ui/screen/cancelled_task_screen.dart';
 import 'package:task_manager/ui/screen/completed_task_screen.dart';
 import 'package:task_manager/ui/screen/new_task_screen.dart';
@@ -12,7 +14,6 @@ class MainBottomNavScreen extends StatefulWidget {
 }
 
 class _MainBottomNavScreenState extends State<MainBottomNavScreen> {
-  int _selectedIndex = 0;
   List<Widget> _screen = [
     NewTaskScreen(),
     ProgressTaskScreen(),
@@ -22,26 +23,30 @@ class _MainBottomNavScreenState extends State<MainBottomNavScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _screen[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: (index) {
-          _selectedIndex = index;
-          setState(() {});
-        },
-        selectedItemColor: Colors.green,
-        unselectedItemColor: Colors.grey,
-        showUnselectedLabels: true,
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.task), label: "New Task"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.change_circle), label: "Progress"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.done_outline_rounded), label: "Completed"),
-          BottomNavigationBarItem(icon: Icon(Icons.cancel), label: "Cancelled"),
-        ],
-      ),
+    return GetBuilder<MainBottomNavController>(
+      builder: (controller) {
+        return Scaffold(
+          body: _screen[controller.selectedIndex],
+          bottomNavigationBar: BottomNavigationBar(
+            currentIndex: controller.selectedIndex,
+            onTap: (index) {
+              controller.receiveIndex(index);
+              setState(() {});
+            },
+            selectedItemColor: Colors.green,
+            unselectedItemColor: Colors.grey,
+            showUnselectedLabels: true,
+            items: [
+              BottomNavigationBarItem(icon: Icon(Icons.task), label: "New Task"),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.change_circle), label: "Progress"),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.done_outline_rounded), label: "Completed"),
+              BottomNavigationBarItem(icon: Icon(Icons.cancel), label: "Cancelled"),
+            ],
+          ),
+        );
+      }
     );
   }
 }

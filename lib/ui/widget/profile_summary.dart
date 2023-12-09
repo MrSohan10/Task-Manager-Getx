@@ -19,48 +19,49 @@ class ProfileSummary extends StatefulWidget {
 }
 
 class _ProfileSummaryState extends State<ProfileSummary> {
-  String? imageFormat = AuthController.user?.photo ?? "";
+  // String? imageFormat = Get.find<AuthController>().user?.photo ?? "";
 
   @override
   Widget build(BuildContext context) {
-    if (imageFormat!.startsWith('data:image')) {
-      imageFormat =
-          imageFormat!.replaceFirst(RegExp(r'data:image/[^;]+;base64,'), " ");
-    }
-    Uint8List imageBytes = const Base64Decoder().convert(imageFormat!);
-
-    return ListTile(
-        onTap: () {
-          if (widget.enableOnTap) {
-            Get.to(const UpdateProfile());
-          }
-        },
-        tileColor: Colors.green,
-        leading: CircleAvatar(
-            child: imageBytes.isEmpty
-                ? const Icon(Icons.person_2_outlined)
-                : CircleAvatar(
-                    backgroundImage: Image.memory(
-                      imageBytes,
-                      fit: BoxFit.cover,
-                    ).image,
-                  )),
-        title: Text(
-          fullName,
-          style: const TextStyle(fontSize: 20, color: Colors.white),
-        ),
-        subtitle: Text(
-          AuthController.user?.email ?? '',
-          style: const TextStyle(color: Colors.white),
-        ),
-        trailing: IconButton(
-          onPressed: showLogOutDialog,
-          icon: Icon(Icons.logout_outlined),
-        ));
+    return GetBuilder<AuthController>(builder: (controller) {
+      // if (imageFormat!.startsWith('data:image')) {
+      //   imageFormat =
+      //       imageFormat!.replaceFirst(RegExp(r'data:image/[^;]+;base64,'), " ");
+      // }
+      Uint8List imageBytes = const Base64Decoder().convert(controller.user?.photo??'');
+      return ListTile(
+          onTap: () {
+            if (widget.enableOnTap) {
+              Get.to(const UpdateProfile());
+            }
+          },
+          tileColor: Colors.green,
+          leading: CircleAvatar(
+              child: imageBytes.isEmpty
+                  ? const Icon(Icons.person_2_outlined)
+                  : CircleAvatar(
+                      backgroundImage: Image.memory(
+                        imageBytes,
+                        fit: BoxFit.cover,
+                      ).image,
+                    )),
+          title: Text(
+            fullName,
+            style: const TextStyle(fontSize: 20, color: Colors.white),
+          ),
+          subtitle: Text(
+            Get.find<AuthController>().user?.email ?? '',
+            style: const TextStyle(color: Colors.white),
+          ),
+          trailing: IconButton(
+            onPressed: showLogOutDialog,
+            icon: Icon(Icons.logout_outlined),
+          ));
+    });
   }
 
   String get fullName {
-    return '${AuthController.user?.firstName ?? ''} ${AuthController.user?.lastName ?? ''}';
+    return '${Get.find<AuthController>().user?.firstName ?? ''} ${Get.find<AuthController>().user?.lastName ?? ''}';
   }
 
   void showLogOutDialog() {

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:task_manager/data/network_caller.dart';
 import 'package:task_manager/data/network_response.dart';
+import 'package:task_manager/ui/controller/email_verify_controller.dart';
 import 'package:task_manager/ui/screen/forget_password/pin_verify.dart';
 import 'package:task_manager/ui/screen/login_screen.dart';
 import 'package:task_manager/ui/widget/body_background.dart';
@@ -19,8 +21,7 @@ class EmailVerification extends StatefulWidget {
 class _EmailVerificationState extends State<EmailVerification> {
   final TextEditingController _emailController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  bool _inProgress = false;
-  ReceiveMailAndOtp receiveMailAddress = ReceiveMailAndOtp();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,15 +75,19 @@ class _EmailVerificationState extends State<EmailVerification> {
                     ),
                     SizedBox(
                       width: double.infinity,
-                      child: Visibility(
-                        visible: _inProgress == false,
-                        replacement: const Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                        child: ElevatedButton(
-                          onPressed: verifyEmail,
-                          child: const Icon(Icons.arrow_circle_right_outlined),
-                        ),
+                      child: GetBuilder<EmailVerifyController>(
+                        builder: (controller) {
+                          return Visibility(
+                            visible: controller.inProgress == false,
+                            replacement: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                            child: ElevatedButton(
+                              onPressed: verifyEmail,
+                              child: const Icon(Icons.arrow_circle_right_outlined),
+                            ),
+                          );
+                        }
                       ),
                     ),
                     const SizedBox(
@@ -100,11 +105,7 @@ class _EmailVerificationState extends State<EmailVerification> {
                         ),
                         TextButton(
                           onPressed: () {
-                            Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const LoginScreen()),
-                                (route) => false);
+                            Get.offAll(const LoginScreen());
                           },
                           child: const Text(
                             "Sign in",
@@ -127,24 +128,14 @@ class _EmailVerificationState extends State<EmailVerification> {
     if (!_formKey.currentState!.validate()) {
       return;
     }
-    _inProgress = true;
-    if (mounted) {
-      setState(() {});
-    }
+    final response = await Get.find<EmailVerifyController>()
+        .verifyEmail(_emailController.text.trim());
 
-    final NetworkResponse response = await NetworkCaller()
-        .getRequest(Urls.verifyEmail(_emailController.text.trim()));
-    _inProgress = false;
-    if (mounted) {
-      setState(() {});
-    }
-    if (response.isSuccess && response.jsonResponse['status'] == 'success') {
-      receiveMailAddress.receiveMail(_emailController.text.trim());
-      Navigator.push(context,
-          MaterialPageRoute(builder: (context) => const PinVerification()));
+    if (response) {
+      Get.to(const PinVerification());
     } else {
       if (mounted) {
-        showSnackbar(context, 'verify failed! please try again', true);
+        showSnackbar(context, Get.find<EmailVerifyController>().failedMessage, true);
       }
     }
   }

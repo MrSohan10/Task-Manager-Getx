@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:task_manager/ui/controller/pin_verify_controller.dart';
 import 'package:task_manager/ui/screen/forget_password/set_password.dart';
 import 'package:task_manager/ui/screen/login_screen.dart';
 import 'package:task_manager/ui/widget/body_background.dart';
-
-import '../../../data/model/receive_mail_otp.dart';
-import '../../../data/network_caller.dart';
-import '../../../data/network_response.dart';
-import '../../../data/utility.dart';
 import '../../widget/snackbar_message.dart';
-
 class PinVerification extends StatefulWidget {
   const PinVerification({super.key});
 
@@ -20,8 +16,6 @@ class PinVerification extends StatefulWidget {
 class _PinVerificationState extends State<PinVerification> {
   final TextEditingController _pinController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  bool _inProgress = false;
-  ReceiveMailAndOtp receiveOtp = ReceiveMailAndOtp();
 
   @override
   Widget build(BuildContext context) {
@@ -96,16 +90,22 @@ class _PinVerificationState extends State<PinVerification> {
                     ),
                     SizedBox(
                       width: double.infinity,
-                      child: Visibility(
-                        visible: _inProgress == false,
-                        replacement: const Center(child: CircularProgressIndicator(),),
-                        child: ElevatedButton(
-                          onPressed: verifyPin,
-                          child: const Text(
-                            'verify',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ),
+                      child: GetBuilder<PinVerifyController>(
+                        builder: (controller) {
+                          return Visibility(
+                            visible: controller.inProgress == false,
+                            replacement: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                            child: ElevatedButton(
+                              onPressed: verifyPin,
+                              child: const Text(
+                                'verify',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ),
+                          );
+                        }
                       ),
                     ),
                     const SizedBox(
@@ -123,11 +123,8 @@ class _PinVerificationState extends State<PinVerification> {
                         ),
                         TextButton(
                           onPressed: () {
-                            Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const LoginScreen()),
-                                (route) => false);
+                            Get.offAll(const LoginScreen());
+
                           },
                           child: const Text(
                             "Sign in",
@@ -150,25 +147,15 @@ class _PinVerificationState extends State<PinVerification> {
     if (!_formKey.currentState!.validate()) {
       return;
     }
-    _inProgress = true;
-    if (mounted) {
-      setState(() {});
-    }
+    final response = await Get.find<PinVerifyController>()
+        .verifyPin(_pinController.text.trim());
 
-    final NetworkResponse response = await NetworkCaller().getRequest(
-        Urls.verifyPin(ReceiveMailAndOtp.mail, _pinController.text.trim()));
-    _inProgress = false;
-    if (mounted) {
-      setState(() {});
-    }
-
-    if (response.isSuccess && response.jsonResponse['status'] == 'success') {
-      receiveOtp.receiveOtp(_pinController.text.trim());
-      Navigator.push(context,
-          MaterialPageRoute(builder: (context) => const SetPassword()));
+    if (response) {
+      Get.to(const SetPassword());
     } else {
       if (mounted) {
-        showSnackbar(context, 'invalid pin! please try again', true);
+        showSnackbar(
+            context, Get.find<PinVerifyController>().failedMessage, true);
       }
     }
   }
@@ -179,5 +166,3 @@ class _PinVerificationState extends State<PinVerification> {
     _pinController.dispose();
   }
 }
-
-

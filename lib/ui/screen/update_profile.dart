@@ -1,15 +1,10 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:task_manager/data/model/user_model.dart';
-import 'package:task_manager/data/network_caller.dart';
-import 'package:task_manager/data/network_response.dart';
 import 'package:task_manager/ui/controller/auth_controller.dart';
+import 'package:task_manager/ui/controller/update_profile_controller.dart';
 import 'package:task_manager/ui/widget/body_background.dart';
 import 'package:task_manager/ui/widget/profile_summary.dart';
-
-import '../../data/utility.dart';
 import '../widget/snackbar_message.dart';
 
 class UpdateProfile extends StatefulWidget {
@@ -26,17 +21,17 @@ class _UpdateProfileState extends State<UpdateProfile> {
   final TextEditingController _mobileController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  bool _updateInProgress = false;
-
-  XFile? photo;
+  final UpdateProfileController _updateProfileController =
+      Get.find<UpdateProfileController>();
+ final AuthController _authController = Get.find<AuthController>();
 
   @override
   void initState() {
     super.initState();
-    _emailController.text = AuthController.user?.email ?? "";
-    _firstNameController.text = AuthController.user?.firstName ?? "";
-    _lastNameController.text = AuthController.user?.lastName ?? "";
-    _mobileController.text = AuthController.user?.mobile ?? "";
+    _emailController.text = _authController.user?.email ?? "";
+    _firstNameController.text = _authController.user?.firstName ?? "";
+    _lastNameController.text = _authController.user?.lastName ?? "";
+    _mobileController.text = _authController.user?.mobile ?? "";
   }
 
   @override
@@ -154,19 +149,22 @@ class _UpdateProfileState extends State<UpdateProfile> {
                             ),
                             SizedBox(
                               width: double.infinity,
-                              child: Visibility(
-                                visible: _updateInProgress == false,
-                                replacement: const Center(
-                                  child: CircularProgressIndicator(),
-                                ),
-                                child: ElevatedButton(
-                                  onPressed: updateProfile,
-                                  child: const Text(
-                                    "Update",
-                                    style: TextStyle(fontSize: 16),
+                              child: GetBuilder<UpdateProfileController>(
+                                  builder: (controller) {
+                                return Visibility(
+                                  visible: controller.updateInProgress == false,
+                                  replacement: const Center(
+                                    child: CircularProgressIndicator(),
                                   ),
-                                ),
-                              ),
+                                  child: ElevatedButton(
+                                    onPressed: updateProfile,
+                                    child: const Text(
+                                      "Update",
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ),
+                                );
+                              }),
                             ),
                           ],
                         ),
@@ -186,45 +184,21 @@ class _UpdateProfileState extends State<UpdateProfile> {
     if (!_formKey.currentState!.validate()) {
       return;
     }
-    _updateInProgress = true;
-    if (mounted) {
-      setState(() {});
-    }
-    String? photoInBase64;
+    final response = await _updateProfileController.updateProfile(
+        _emailController.text.trim(),
+        _firstNameController.text.trim(),
+        _lastNameController.text.trim(),
+        _mobileController.text.trim(),
+        _passwordController.text,
+        );
 
-    Map<String, dynamic> inputData = {
-      "email": _emailController.text.trim(),
-      "firstName": _firstNameController.text.trim(),
-      "lastName": _lastNameController.text.trim(),
-      "mobile": _mobileController.text.trim(),
-    };
-    if (_passwordController.text.isNotEmpty) {
-      inputData["password"] = _passwordController.text;
-    }
-    if (photo != null) {
-      List<int> imageBytes = await photo!.readAsBytes();
-      photoInBase64 = base64Encode(imageBytes);
-      inputData["photo"] = photoInBase64;
-    }
-    final NetworkResponse response =
-        await NetworkCaller().postRequest(Urls.updateProfile, body: inputData);
-    _updateInProgress = false;
-    if (mounted) {
-      setState(() {});
-    }
-    if (response.isSuccess) {
-      AuthController.updateInformation(UserModel(
-          email: _emailController.text.trim(),
-          firstName: _firstNameController.text.trim(),
-          lastName: _lastNameController.text.trim(),
-          mobile: _mobileController.text.trim(),
-          photo: photoInBase64 ?? AuthController.user?.photo));
+    if (response) {
       if (mounted) {
-        showSnackbar(context, "Update profile Success!");
+        showSnackbar(context, _updateProfileController.message);
       }
-      Navigator.pop(context);
+      Get.back();
     } else {
-      showSnackbar(context, "Update failed! please try again.", true);
+      showSnackbar(context, _updateProfileController.failedMessage, true);
     }
   }
 
@@ -258,10 +232,14 @@ class _UpdateProfileState extends State<UpdateProfile> {
                 },
                 child: Container(
                   padding: const EdgeInsets.only(left: 16),
-                  child: Visibility(
-                    visible: photo == null,
-                    replacement: Text(photo?.name ?? ""),
-                    child: const Text('Select a photo'),
+                  child: GetBuilder<UpdateProfileController>(
+                    builder: (updateProfileController) {
+                      return Visibility(
+                        visible: updateProfileController.photo == null,
+                        replacement: Text(updateProfileController.photo?.name ?? ""),
+                        child: const Text('Select a photo'),
+                      );
+                    }
                   ),
                 ),
               )),
@@ -293,19 +271,16 @@ class _UpdateProfileState extends State<UpdateProfile> {
                                       source: ImageSource.gallery,
                                       imageQuality: 50);
                               if (image != null) {
-                                photo = image;
-                                if (mounted) {
-                                  setState(() {});
-                                }
+                                _updateProfileController.receiveImage(image);
                               }
-                              Navigator.pop(context);
+                              Get.back();
                             },
-                            icon: Icon(
+                            icon: const Icon(
                               Icons.image,
                               size: 36,
                               color: Colors.green,
                             )),
-                        Text("  Gallery", style: TextStyle(fontSize: 20))
+                        const Text("  Gallery", style: TextStyle(fontSize: 20))
                       ],
                     ),
                     Column(
@@ -317,19 +292,16 @@ class _UpdateProfileState extends State<UpdateProfile> {
                                       source: ImageSource.camera,
                                       imageQuality: 50);
                               if (image != null) {
-                                photo = image;
-                                if (mounted) {
-                                  setState(() {});
-                                }
+                                _updateProfileController.receiveImage(image);
                               }
-                              Navigator.pop(context);
+                              Get.back();
                             },
-                            icon: Icon(
+                            icon: const Icon(
                               Icons.camera_alt_rounded,
                               size: 36,
                               color: Colors.green,
                             )),
-                        Text(
+                        const Text(
                           "  Camera",
                           style: TextStyle(fontSize: 20),
                         )

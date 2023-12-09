@@ -20,7 +20,7 @@ class LoginController extends GetxController {
     _loginInProgress = false;
     update();
     if (response.isSuccess) {
-      await AuthController.saveInformation(response.jsonResponse['token'],
+      await Get.find<AuthController>().saveInformation(response.jsonResponse['token'],
           UserModel.fromJson(response.jsonResponse['data']));
       return true;
     } else {
