@@ -13,12 +13,14 @@ class UpdateProfileController extends GetxController {
   bool _updateInProgress = false;
   String _message = "";
   String _failedMessage = "";
+  XFile? _photo;
   bool get updateInProgress => _updateInProgress;
   String get message => _message;
   String get failedMessage => _failedMessage;
-  XFile? photo;
+  XFile? get photo => _photo;
+
   receiveImage (image){
-    photo = image;
+    _photo = image;
     update();
   }
   Future<bool> updateProfile(
@@ -36,8 +38,8 @@ class UpdateProfileController extends GetxController {
     if (password.isNotEmpty) {
       inputData["password"] = password;
     }
-    if (photo != null) {
-      List<int> imageBytes = await photo!.readAsBytes();
+    if (_photo != null) {
+      List<int> imageBytes = await _photo!.readAsBytes();
       photoInBase64 = base64Encode(imageBytes);
       inputData["photo"] = photoInBase64;
     }

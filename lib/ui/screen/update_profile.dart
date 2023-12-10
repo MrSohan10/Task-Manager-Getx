@@ -25,6 +25,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
       Get.find<UpdateProfileController>();
  final AuthController _authController = Get.find<AuthController>();
 
+
   @override
   void initState() {
     super.initState();
@@ -32,6 +33,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
     _firstNameController.text = _authController.user?.firstName ?? "";
     _lastNameController.text = _authController.user?.lastName ?? "";
     _mobileController.text = _authController.user?.mobile ?? "";
+    _updateProfileController.receiveImage(null);
   }
 
   @override

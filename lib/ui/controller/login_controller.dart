@@ -29,6 +29,7 @@ class LoginController extends GetxController {
 
       } else {
           _failedMessage = 'Login failed! please try again';
+
       }
     }
     return false;

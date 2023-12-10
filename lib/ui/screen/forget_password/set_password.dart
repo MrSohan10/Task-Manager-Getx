@@ -20,7 +20,7 @@ class SetPassword extends StatefulWidget {
 class _SetPasswordState extends State<SetPassword> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
-      TextEditingController();
+  TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
@@ -42,7 +42,10 @@ class _SetPasswordState extends State<SetPassword> {
                     ),
                     Text(
                       "Set Password",
-                      style: Theme.of(context).textTheme.titleLarge,
+                      style: Theme
+                          .of(context)
+                          .textTheme
+                          .titleLarge,
                     ),
                     const SizedBox(
                       height: 2,
@@ -94,20 +97,20 @@ class _SetPasswordState extends State<SetPassword> {
                       width: double.infinity,
                       child: GetBuilder<SetPasswordController>(
                           builder: (controller) {
-                        return Visibility(
-                          visible: controller.inProgress == false,
-                          replacement: const Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                          child: ElevatedButton(
-                            onPressed: resetPassword,
-                            child: const Text(
-                              "Confirm",
-                              style: TextStyle(fontSize: 16),
-                            ),
-                          ),
-                        );
-                      }),
+                            return Visibility(
+                              visible: controller.inProgress == false,
+                              replacement: const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                              child: ElevatedButton(
+                                onPressed: resetPassword,
+                                child: const Text(
+                                  "Confirm",
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                              ),
+                            );
+                          }),
                     ),
                     const SizedBox(
                       height: 48,
@@ -152,15 +155,21 @@ class _SetPasswordState extends State<SetPassword> {
           .resetPassword(_confirmPasswordController.text);
 
       if (response) {
-        showSnackbar(
-          context,
-          Get.find<SetPasswordController>().message,
-        );
         Get.offAll(const LoginScreen());
+        if (mounted) {
+          showSnackbar(
+            context,
+            Get
+                .find<SetPasswordController>()
+                .message,
+          );
+        }
       } else {
         if (mounted) {
           showSnackbar(
-              context, Get.find<SetPasswordController>().failedMessage, true);
+              context, Get
+              .find<SetPasswordController>()
+              .failedMessage, true);
         }
       }
     } else {
