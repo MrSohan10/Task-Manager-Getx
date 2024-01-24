@@ -30,6 +30,11 @@ class TaskManager extends StatelessWidget {
       home: const SplashScreen(),
       initialBinding: ControllerBinder(),
       theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.green,
+            primary: Colors.green,
+            background: Colors.white,
+          ),
           primaryColor: Colors.green,
           primarySwatch: Colors.green,
           textTheme: TextTheme(
@@ -46,8 +51,16 @@ class TaskManager extends StatelessWidget {
                   borderSide: BorderSide(color: Colors.green))),
           elevatedButtonTheme: ElevatedButtonThemeData(
               style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+            foregroundColor: Colors.white,
             padding: EdgeInsets.symmetric(vertical: 14),
-          ))),
+          )),
+        floatingActionButtonTheme: FloatingActionButtonThemeData(
+          backgroundColor: Colors.green,
+          foregroundColor: Colors.white,
+        )
+
+      ),
     );
   }
 }
@@ -71,7 +84,5 @@ class ControllerBinder extends Bindings {
     Get.put(EmailVerifyController());
     Get.put(PinVerifyController());
     Get.put(SetPasswordController());
-
-
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controller/canceled_task_controller.dart';
+import '../controller/main_bottom_nav_controller.dart';
 import '../widget/profile_summary.dart';
 import '../widget/task_item_card.dart';
 
@@ -23,41 +24,47 @@ class _CancelledTaskScreenState extends State<CancelledTaskScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            const ProfileSummary(),
-            const SizedBox(
-              height: 10,
-            ),
-            Expanded(
-                child: GetBuilder<CancelledTaskController>(
-                  builder: (controller) {
-                    return Visibility(
-              visible: controller.taskListProgress == false,
-              replacement: const Center(
-                    child: CircularProgressIndicator(),
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (_) {
+        Get.find<MainBottomNavController>().backToHome();
+      },
+      child: Scaffold(
+        body: SafeArea(
+          child: Column(
+            children: [
+              const ProfileSummary(),
+              const SizedBox(
+                height: 10,
               ),
-              child: ListView.builder(
-                    itemCount: controller.taskListModel.taskList?.length ?? 0,
-                    itemBuilder: (context, index) {
-                      return TaskItemCard(
-                        color: Colors.red,
-                        task: controller.taskListModel.taskList![index],
-                        onDelete: () {
-                          controller.getCancelledTask();
-                        },
-                        statusChange: () {
-                          controller.getCancelledTask();
-                        },
-                      );
-                    },
-              ),
-            );
-                  }
-                )),
-          ],
+              Expanded(
+                  child: GetBuilder<CancelledTaskController>(
+                    builder: (controller) {
+                      return Visibility(
+                visible: controller.taskListProgress == false,
+                replacement: const Center(
+                      child: CircularProgressIndicator(),
+                ),
+                child: ListView.builder(
+                      itemCount: controller.taskListModel.taskList?.length ?? 0,
+                      itemBuilder: (context, index) {
+                        return TaskItemCard(
+                          color: Colors.red,
+                          task: controller.taskListModel.taskList![index],
+                          onDelete: () {
+                            controller.getCancelledTask();
+                          },
+                          statusChange: () {
+                            controller.getCancelledTask();
+                          },
+                        );
+                      },
+                ),
+              );
+                    }
+                  )),
+            ],
+          ),
         ),
       ),
     );

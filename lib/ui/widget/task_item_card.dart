@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:task_manager/data/model/task.dart';
-import 'package:task_manager/data/network_caller.dart';
-import 'package:task_manager/data/network_response.dart';
-import '../../data/utility.dart';
 import '../controller/delete_task_controller.dart';
 import '../controller/update_task_status_controller.dart';
 
@@ -28,10 +25,10 @@ class TaskItemCard extends StatefulWidget {
 }
 
 class _TaskItemCardState extends State<TaskItemCard> {
-
   @override
   Widget build(BuildContext context) {
     return Card(
+      elevation: 1,
       margin: EdgeInsets.only(left: 10, right: 10, top: 8),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -48,6 +45,10 @@ class _TaskItemCardState extends State<TaskItemCard> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Chip(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  side: BorderSide.none,
                   label: Text(
                     widget.task.status ?? 'New',
                     style: const TextStyle(color: Colors.white),
