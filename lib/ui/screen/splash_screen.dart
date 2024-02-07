@@ -39,9 +39,9 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       body: BodyBackground(
         child: Center(
-          child: SvgPicture.asset(
-            "assets/images/logo.svg",
-            width: 120,
+          child: Image.asset(
+            "assets/images/logo.png",
+            width: 150,
           ),
         ),
       ),
